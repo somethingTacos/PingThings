@@ -85,11 +85,11 @@ namespace PingThings.ViewModel
 
             bool CanChangeView = true;
 
-            foreach(PingGroup group in pings.Things)
+            foreach (PingGroup group in pings.Things)
             {
-                foreach(PingThing thing in group.Pings)
+                foreach (PingThing thing in group.Pings)
                 {
-                    if(thing.TotalSent < 2)
+                    if (thing.TotalSent < 2)
                     {
                         CanChangeView = false;
                     }
@@ -104,8 +104,8 @@ namespace PingThings.ViewModel
             }
             else
             {
-                MainQueue.Enqueue("Sorry, Can't load the graph view until all ping groups have sent at least 2 pings. This is a bug work around.",
-                                  "Oh, ok :(", 
+                MainQueue.Enqueue("Sorry, Can't load the graph view until all ping groups have sent at least 2 pings.",
+                                  "Oh, ok :(",
                                   () => { });
             }
         }

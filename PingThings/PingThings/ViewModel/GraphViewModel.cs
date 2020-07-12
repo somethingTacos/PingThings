@@ -139,7 +139,7 @@ namespace PingThings.ViewModel
 
                 List<string> GroupNames = NewGraphData.Select(x => x.GroupName).Distinct().ToList();
 
-                if(GroupNames.Count > 1)
+                if (GroupNames.Count > 1)
                 {
                     graphCollection.GraphColumns = 2;
                 }

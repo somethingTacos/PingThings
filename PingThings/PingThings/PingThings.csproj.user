@@ -9,9 +9,6 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="CustomControls\CenteredDialogControl.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="CustomControls\LazyDialogs\AddPingDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -38,9 +35,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="CustomControls\CenteredDialogControl.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="CustomControls\LazyDialogs\AddPingDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
