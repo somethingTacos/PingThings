@@ -1,0 +1,70 @@
+﻿<UserControl x:Class="PingThings.CustomControls.PingThingControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PingThings.CustomControls"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="InfoFontSize" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <md:Card>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="AUTO"/>
+                    <ColumnDefinition Width="AUTO"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="AUTO"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="AUTO"/>
+                    <RowDefinition Height="AUTO"/>
+                    <RowDefinition Height="AUTO"/>
+                    <RowDefinition Height="AUTO"/>
+                    <RowDefinition Height="5"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="{Binding Path=Label, 
+                          RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                   FontSize="20"
+                   Grid.Column="1" Grid.ColumnSpan="5"
+                   Grid.Row="1" Grid.RowSpan="2"/>
+
+                <TextBlock Text="Total Sent: " Grid.Column="1" Grid.Row="4"
+                   Style="{StaticResource InfoFontSize}"
+                   />
+                <TextBlock Text="{Binding Path=TotalSent, 
+                          RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                   Grid.Column="2" Grid.Row="4"
+                   Style="{StaticResource InfoFontSize}"
+                   />
+
+                <TextBlock Text="Total Replied: " Grid.Column="4" Grid.Row="3"
+                   Style="{StaticResource InfoFontSize}"
+                   />
+                <TextBlock Text="{Binding Path=TotalReplies,
+                          RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                   Grid.Column="5" Grid.Row="3"
+                   Style="{StaticResource InfoFontSize}"
+                   />
+
+                <TextBlock Text="Total Failed: " Grid.Column="4" Grid.Row="4"
+                   Style="{StaticResource InfoFontSize}"
+                   />
+                <TextBlock Text="{Binding Path=TotalFailed,
+                          RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                   Grid.Column="5" Grid.Row="4"
+                   Style="{StaticResource InfoFontSize}"
+                   />
+            </Grid>
+        </md:Card>
+    </Grid>
+</UserControl>

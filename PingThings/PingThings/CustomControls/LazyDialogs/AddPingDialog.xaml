@@ -1,0 +1,123 @@
+﻿<UserControl x:Class="PingThings.CustomControls.LazyDialogs.AddPingDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PingThings.CustomControls.LazyDialogs"
+             xmlns:model="clr-namespace:PingThings.Model"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="700" Background="Gainsboro"
+             MaxHeight="500" MaxWidth="700">
+    <!-- This whole thing should be turned into a dialog for a dialog host 
+         at some point. Maybe one day, idk... -->
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}"
+               BasedOn="{StaticResource OverheadDialogTextBlock1}"
+               />
+        <Style TargetType="{x:Type TextBox}"
+               BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}"
+               />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="AUTO"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="AUTO"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="AUTO"/>
+            <ColumnDefinition Width="AUTO"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="AUTO"/>
+        </Grid.RowDefinitions>
+        
+        <TextBox x:Name="GroupName_Box"
+                 Grid.Row="1"
+                 Grid.Column="1" Grid.ColumnSpan="6"
+                 TextChanged="GroupName_Box_TextChanged"
+                 md:HintAssist.Hint="Group Name"
+                 md:HintAssist.FloatingScale=".75"
+                 />
+        <TextBox x:Name="GroupInterval_Box" Margin="0 0 0 5"
+                 Grid.Row="2"
+                 Grid.Column="1"
+                 md:HintAssist.Hint="Group Interval"
+                 md:HintAssist.FloatingScale=".75"
+                 />
+
+        <Separator Grid.Row="3" VerticalAlignment="Top" 
+                   Grid.ColumnSpan="8"
+                   Style="{StaticResource MaterialDesignDarkSeparator}"
+                   />
+
+        
+        <TextBox x:Name="Label_Box" Grid.Row="4" Grid.Column="1"
+                 Width="200"
+                 md:HintAssist.Hint="Label"
+                 md:HintAssist.FloatingScale=".75"
+                 >
+            <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding Path=AddPingEnterKeyCommand, RelativeSource={
+                                                  RelativeSource AncestorType=UserControl}}"/>
+            </TextBox.InputBindings>
+        </TextBox>
+
+        
+        <TextBox x:Name="Host_Box" Grid.Row="4" Grid.Column="3" Width="200"
+                 md:HintAssist.Hint="Host"
+                 md:HintAssist.FloatingScale=".75">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding Path=AddPingEnterKeyCommand, RelativeSource={
+                                                  RelativeSource AncestorType=UserControl}}"/>
+            </TextBox.InputBindings>
+        </TextBox>
+
+        <Button x:Name="AddPingButton"  Content="Add Ping" Grid.Column="5" Grid.Row="4"
+                Click="AddPingButton_Click"
+                Style="{StaticResource MaterialDesignOutlinedButton}"
+                md:ButtonAssist.CornerRadius="5 0 0 5"
+                />
+        <Button x:Name="RemovePingButton"  Content="Remove Selected" Grid.Column="6" Grid.Row="4"
+                Click="RemovePingButton_Click"
+                md:ButtonAssist.CornerRadius="0 5 5 0"
+                Style="{StaticResource MaterialDesignOutlinedButton}"
+                />
+
+        <ListView x:Name="PingList" Grid.Column="1" Grid.ColumnSpan="6"
+                  Grid.Row="5" Margin="0 5 0 0">
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="{x:Type model:PingThing}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Label}"/>
+                        <TextBlock Text=" : "/>
+                        <TextBlock Text="{Binding Host}"/>
+                        <TextBlock Text=" : "/>
+                        <TextBlock Text="{Binding CurrentStatus}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+        </ListView>
+
+        <md:Snackbar Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="4"
+                     MessageQueue="{Binding Path=NotificationQueue, RelativeSource={RelativeSource
+                                    AncestorType=UserControl}}"/>
+
+        <Button x:Name="CancelButton" Grid.Column="5" Grid.Row="6" Margin="10"
+                Content="Cancel"
+                Command="{x:Static md:DialogHost.CloseDialogCommand}"/>
+
+        <Button x:Name="AddGroupButton"  Grid.Column="6" Grid.Row="6" Margin="10"
+                Content="Add Group"
+                Click="AddGroupButton_Click"/>
+    </Grid>
+</UserControl>
