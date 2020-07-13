@@ -14,8 +14,8 @@ Here are some gifs...
 
 <h3>Removing Ping Groups</h3>
 
-![Adding Ping Groups](gifs/RemoveGroups.gif)
+![Removing Ping Groups](gifs/RemoveGroups.gif)
 
 <h3>Displaying Graphs</h3>
 
-![Adding Ping Groups](gifs/DisplayGraphs.gif)
+![Displaying Graphs](gifs/DisplayGraphs.gif)
