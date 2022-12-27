@@ -12,6 +12,10 @@ Here are some gifs...
 
 ![Adding Ping Groups](gifs/AddPingGroup.gif)
 
+<h3>Adding a New Ping Group from a File</h3>
+
+![Adding Ping Group from File](gifs/AddPingGroupWithDrop.gif)
+
 <h3>Removing Ping Groups</h3>
 
 ![Removing Ping Groups](gifs/RemoveGroups.gif)
