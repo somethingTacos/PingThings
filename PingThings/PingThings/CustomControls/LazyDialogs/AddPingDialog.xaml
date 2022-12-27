@@ -8,7 +8,9 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="700" Background="Gainsboro"
-             MaxHeight="500" MaxWidth="700">
+             MaxHeight="500" MaxWidth="700"
+             AllowDrop="True"
+             Drop="UserControl_Drop">
     <!-- This whole thing should be turned into a dialog for a dialog host 
          at some point. Maybe one day, idk... -->
     <UserControl.Resources>
@@ -62,6 +64,7 @@
         
         <TextBox x:Name="Label_Box" Grid.Row="4" Grid.Column="1"
                  Width="200"
+                 TextChanged="Label_Box_TextChanged"
                  md:HintAssist.Hint="Label"
                  md:HintAssist.FloatingScale=".75"
                  >

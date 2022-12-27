@@ -2,11 +2,16 @@
 using PingThings.Helpers;
 using PingThings.Model;
 using System;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.VisualBasic;
 
 namespace PingThings.CustomControls.LazyDialogs
 {
@@ -27,6 +32,25 @@ namespace PingThings.CustomControls.LazyDialogs
             _pings = pings;
         }
 
+        (bool, string) ValidatePingInfo(string Label, string Host) =>
+            (String.IsNullOrEmpty(Label), String.IsNullOrEmpty(Host), Label.Contains(']')) switch
+            {
+                (_, _, true) => (false, "Label contains reserved character ']'"),
+                (_, true, _) => (false, "Host cannot be empty"),
+                (true, _, _) => (true, Host),
+                (_, _, _) => (true, "")
+            };
+
+        private (bool, string) validateGroupInfo(string possibleInterval, string GroupName, out int interval) =>
+                (String.IsNullOrEmpty(GroupName), int.TryParse(possibleInterval, out interval),
+                _pings.Things.Where(x => x.GroupName == Name).Count() > 0) switch
+                {
+                    (true, _, _) => (false, "Group Name cannot be empty"),
+                    (_, false, _) => (false, "Interval must be a number in seconds and cannot be empty"),
+                    (_, _, true) => (false, "Group name already exists"),
+                    (_, true, _) => (true, "")
+                };
+
         public void OnAddPingEnterKeyCommand(object parameter)
         {
             AddPingButton_Click(this, null);
@@ -37,15 +61,7 @@ namespace PingThings.CustomControls.LazyDialogs
             int interval = 0;
             string Name = GroupName_Box.Text;
 
-            (bool, string) validateGroupInfo(string possibleInterval, string GroupName) =>
-                (String.IsNullOrEmpty(GroupName), int.TryParse(possibleInterval, out interval)) switch
-                {
-                    (true, _) => (false, "Group Name cannot be empty"),
-                    (_, false) => (false, "Interval must be a number in seconds and cannot be empty"),
-                    (_, true) => (true, "")
-                };
-
-            (bool, string) ValidInfo = validateGroupInfo(GroupInterval_Box.Text, Name);
+            (bool, string) ValidInfo = validateGroupInfo(GroupInterval_Box.Text, Name, out interval);
 
             if (ValidInfo.Item1)
             {
@@ -77,24 +93,15 @@ namespace PingThings.CustomControls.LazyDialogs
             }
         }
 
-        private void AddPingButton_Click(object sender, RoutedEventArgs e)
+        private void AddPing(string label, string host)
         {
-            (bool, string) ValidatePingInfo(string Label, string Host) =>
-            (String.IsNullOrEmpty(Label), String.IsNullOrEmpty(Host), Label.Contains(']')) switch
-            {
-                (_, _, true) => (false, "Label contains reserved character ']'"),
-                (_, true, _) => (false, "Host cannot be empty"),
-                (true, _, _) => (true, Host),
-                (_, _, _) => (true, "")
-            };
-
-            (bool, string) ValidInfo = ValidatePingInfo(Label_Box.Text, Host_Box.Text);
+            (bool, string) ValidInfo = ValidatePingInfo(label, host);
 
             if (ValidInfo.Item1)
             {
-                if (Host_Box.Text == ValidInfo.Item2) { Label_Box.Text = Host_Box.Text; }
+                if (host == ValidInfo.Item2) { label = host; }
 
-                PingThing newPing = new PingThing { Label = Label_Box.Text, Host = Host_Box.Text, CurrentStatus = "Checking..." };
+                PingThing newPing = new PingThing { Label = label, Host = host, CurrentStatus = "Checking..." };
 
                 Task.Run(() =>
                 {
@@ -110,9 +117,6 @@ namespace PingThings.CustomControls.LazyDialogs
                 });
 
                 PingList.Items.Add(newPing);
-                Label_Box.Text = "";
-                Label_Box.Focus();
-                Host_Box.Text = "";
             }
             else
             {
@@ -120,10 +124,17 @@ namespace PingThings.CustomControls.LazyDialogs
             }
         }
 
+        private void AddPingButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddPing(Label_Box.Text, Host_Box.Text);
+
+            Label_Box.Text = "";
+            Label_Box.Focus();
+            Host_Box.Text = "";
+        }
+
         private void RemovePingButton_Click(object sender, RoutedEventArgs e)
         {
-
-
             if (PingList.SelectedItem is PingThing pt)
             {
                 if (pt.CurrentStatus == "NOT Responding")
@@ -147,12 +158,12 @@ namespace PingThings.CustomControls.LazyDialogs
             PingList.Items.Remove(PingList.SelectedItem);
         }
 
-        private void GroupName_Box_TextChanged(object sender, TextChangedEventArgs e)
+        private string EscapeText(string text)
         {
             StringBuilder sb = new StringBuilder();
             char[] AllowedChars = { '.', '_', ' ', '-' };
 
-            foreach (char c in GroupName_Box.Text)
+            foreach (char c in text)
             {
                 if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || AllowedChars.Contains(c))
                 {
@@ -160,8 +171,66 @@ namespace PingThings.CustomControls.LazyDialogs
                 }
             }
 
-            GroupName_Box.Text = sb.ToString();
-            GroupName_Box.CaretIndex = sb.Length;
+            return sb.ToString();
+        }
+
+        private void GroupName_Box_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string escapedText = EscapeText(GroupName_Box.Text);
+            GroupName_Box.Text = escapedText;
+            GroupName_Box.CaretIndex = escapedText.Length;
+        }
+
+        private void Label_Box_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string escapedText = EscapeText(Label_Box.Text);
+            Label_Box.Text = escapedText;
+            Label_Box.CaretIndex = escapedText.Length;
+        }
+
+        private GroupData LoadData(string json)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<GroupData>(json);
+            }
+            catch(Exception ex)
+            {
+                NotificationQueue.Enqueue(ex.Message);
+            }
+
+            return null;
+        }
+
+        private void UserControl_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                try
+                {
+                    var file = new FileInfo(files[0]);
+                    
+                    if(file.Exists && file.Extension == ".json")
+                    {
+                        var groupData = LoadData(File.ReadAllText(file.FullName));
+
+                        if (groupData == null) return;
+
+                        GroupName_Box.Text = EscapeText(groupData.GroupName);
+
+                        foreach(var ping in groupData.Pings)
+                        {
+                            AddPing(ping.Label, ping.Host);
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    NotificationQueue.Enqueue(ex.Message);
+                }
+            }
         }
     }
 }
