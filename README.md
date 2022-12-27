@@ -4,8 +4,6 @@ A fancy ping tool with graphs and stuff.
 
 Collect long running connection latency and status information, and view the data in a graph.
 
-You can install this program with the 'PingThings Setup.msi'
-
 Here are some gifs...
 
 <h3>Adding a New Ping Group</h3>
